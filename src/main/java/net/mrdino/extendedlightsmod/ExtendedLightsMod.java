@@ -1,6 +1,9 @@
 package net.mrdino.extendedlightsmod;
 
 import com.mojang.logging.LogUtils;
+import net.mrdino.extendedlightsmod.registry.ModBlocks;
+import net.mrdino.extendedlightsmod.registry.ModBlockEntities;
+import net.mrdino.extendedlightsmod.registry.ModCreativeTabs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -8,53 +11,55 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
+
 @Mod(ExtendedLightsMod.MOD_ID)
-public class ExtendedLightsMod
-{
+public class ExtendedLightsMod {
     // Define mod id in a common place for everything to reference
     public static final String MOD_ID = "extendedlightsmod";
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public ExtendedLightsMod(FMLJavaModLoadingContext context)
-    {
-        IEventBus modEventBus = context.getModEventBus();
+    // Aquí inicializamos el bus de eventos correctamente dentro del constructor
+    public ExtendedLightsMod() {
+        // Accedemos al modEventBus a través de FMLJavaModLoadingContext
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        // Register the commonSetup method for modloading
+        // Registra los bloques, entidades y demás componentes
+        ModBlocks.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
+        ModCreativeTabs.register(modEventBus);
+
+        // Añadimos los listeners necesarios
         modEventBus.addListener(this::commonSetup);
-
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
-
-        // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
+
+        // Registra el mod en el bus de eventos de Minecraft
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
+        // Setup común del mod
     }
 
-    // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        // Añade ítems a la pestaña creativa
     }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
+        // Acciones que deben ocurrir cuando el servidor arranque
     }
 
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents
-    {
+    public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+            // Setup del cliente si es necesario
         }
     }
 }
